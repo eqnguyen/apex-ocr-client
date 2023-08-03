@@ -14,6 +14,7 @@ from rich.logging import RichHandler
 logging.captureWarnings(True)
 logger = logging.getLogger(__name__)
 
+# TODO: Remove this and get this from Apex ROI
 PRIMARY_MONITOR = get_primary_monitor()
 PRIMARY_BBOX = (
     PRIMARY_MONITOR.x,
@@ -25,7 +26,7 @@ PRIMARY_BBOX = (
 
 @click.command()
 @click.option("-i", "--interval", default=3, type=int)
-@click.option("-n", "--num-images", default=10, type=int)
+@click.option("-n", "--num-images", default=5, type=int)
 @click.option("-u", "--url", default="http://localhost:8000/uploadfile/", type=str)
 @click.option("-d", "--debug", is_flag=True, show_default=True, default=False)
 def main(interval: int, num_images: int, url: str, debug: bool):
@@ -46,8 +47,9 @@ def main(interval: int, num_images: int, url: str, debug: bool):
 
             # Take multiple screenshots of the results screen
             dup_images = []
-            for _ in range(num_images)
-            dup_images = [ImageGrab.grab(bbox=PRIMARY_BBOX) ]
+            for _ in range(num_images):
+                dup_images.append(ImageGrab.grab(bbox=PRIMARY_BBOX))
+                time.sleep(0.5)
 
             # Composite the images together
             composite_image = dup_images[0]
@@ -65,6 +67,8 @@ def main(interval: int, num_images: int, url: str, debug: bool):
                     filepath = DATA_DIRECTORY / (timestamp + f"_{i+2}.png")
                     img.save(filepath)
 
+            # Send to API endpoint
+            # TODO: Update the URL
             files = {"file": open(filepath, "rb")}
             response = requests.post(url, files=files)
             print(response.json())
