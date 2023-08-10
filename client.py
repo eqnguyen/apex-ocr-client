@@ -45,7 +45,10 @@ def main(interval: int, num_images: int, url: str, debug: bool):
     while RUNNING:
         # Get summary type of current screen
         logger.debug("Detecting summary page on screen...")
-        summary_type = ocr_engine.classify_summary_page(debug=debug)
+
+        # Take screenshot and classify page
+        screenshot = ImageGrab.grab(bbox=PRIMARY_BBOX)
+        summary_type = ocr_engine.classify_summary_page(screenshot, debug=debug)
 
         if summary_type == SummaryType.SQUAD:
             logger.info("Squad summary page detected")
